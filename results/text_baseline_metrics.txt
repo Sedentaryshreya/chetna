@@ -1,0 +1,39 @@
+TF-IDF + LogisticRegression baseline | C=4.0 | class_weight=balanced
+
+===== VALIDATION (n=23880) =====
+              precision    recall  f1-score   support
+
+      BENIGN      0.979     0.972     0.975     21502
+     ABUSIVE      0.743     0.801     0.771      2306
+      THREAT      0.581     0.347     0.435        72
+
+    accuracy                          0.954     23880
+   macro avg      0.768     0.707     0.727     23880
+weighted avg      0.955     0.954     0.954     23880
+
+Confusion matrix (rows=true, cols=predicted; order BENIGN, ABUSIVE, THREAT):
+[[20901   598     3]
+ [  443  1848    15]
+ [    6    41    25]]
+BENIGN: ROC-AUC=0.972  PR-AUC=0.996  (positives=21502)
+ABUSIVE: ROC-AUC=0.969  PR-AUC=0.857  (positives=2306)
+THREAT: ROC-AUC=0.991  PR-AUC=0.487  (positives=72)
+
+===== TEST (n=23880) =====
+              precision    recall  f1-score   support
+
+      BENIGN      0.978     0.972     0.975     21503
+     ABUSIVE      0.742     0.789     0.765      2306
+      THREAT      0.493     0.465     0.478        71
+
+    accuracy                          0.953     23880
+   macro avg      0.738     0.742     0.739     23880
+weighted avg      0.954     0.953     0.953     23880
+
+Confusion matrix (rows=true, cols=predicted; order BENIGN, ABUSIVE, THREAT):
+[[20894   601     8]
+ [  461  1819    26]
+ [    6    32    33]]
+BENIGN: ROC-AUC=0.971  PR-AUC=0.996  (positives=21503)
+ABUSIVE: ROC-AUC=0.967  PR-AUC=0.844  (positives=2306)
+THREAT: ROC-AUC=0.972  PR-AUC=0.440  (positives=71)

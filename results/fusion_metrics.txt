@@ -1,0 +1,120 @@
+FUSION EVALUATION (protocol: docs/fusion_protocol.md)
+TEST scenarios pooled over 5 rotations: 9000 | HIGH: 1500
+HIGH thresholds chosen on VALIDATION only:
+method    audio_only  text_only  fusion  mean_rule  min_rule
+rotation                                                    
+0               0.09       0.28    0.20       0.52      0.03
+1               0.18       0.12    0.46       0.51      0.03
+2               0.15       0.19    0.28       0.51      0.04
+3               0.18       0.28    0.44       0.51      0.08
+4               0.10       0.22    0.26       0.52      0.08
+
+PRIMARY TASK: HIGH vs not-HIGH, pooled TEST, point estimate [95% source-bootstrap CI]
+(CI reflects uncertainty from the small number of unique source clips/comments)
+
+RECALL
+  audio_only  0.864  [0.747, 0.960]
+  text_only   0.779  [0.664, 0.871]
+  fusion      0.740  [0.631, 0.836]
+  mean_rule   0.671  [0.556, 0.774]
+  min_rule    0.673  [0.549, 0.788]
+
+PRECISION
+  audio_only  0.331  [0.269, 0.391]
+  text_only   0.421  [0.340, 0.486]
+  fusion      0.756  [0.673, 0.823]
+  mean_rule   0.890  [0.836, 0.928]
+  min_rule    0.861  [0.799, 0.902]
+
+F1
+  audio_only  0.478  [0.404, 0.545]
+  text_only   0.546  [0.467, 0.609]
+  fusion      0.748  [0.671, 0.808]
+  mean_rule   0.765  [0.677, 0.836]
+  min_rule    0.755  [0.662, 0.832]
+
+FPR
+  audio_only  0.350  [0.278, 0.416]
+  text_only   0.215  [0.174, 0.255]
+  fusion      0.048  [0.031, 0.066]
+  mean_rule   0.017  [0.011, 0.023]
+  min_rule    0.022  [0.015, 0.029]
+
+FNR
+  audio_only  0.136  [0.040, 0.253]
+  text_only   0.221  [0.129, 0.336]
+  fusion      0.260  [0.164, 0.369]
+  mean_rule   0.329  [0.226, 0.444]
+  min_rule    0.327  [0.212, 0.451]
+
+ROC
+  audio_only  0.797  [0.758, 0.840]
+  text_only   0.863  [0.830, 0.894]
+  fusion      0.962  [0.945, 0.977]
+  mean_rule   0.919  [0.889, 0.948]
+  min_rule    0.963  [0.939, 0.980]
+
+PR
+  audio_only  0.333  [0.266, 0.403]
+  text_only   0.474  [0.382, 0.560]
+  fusion      0.859  [0.794, 0.910]
+  mean_rule   0.815  [0.739, 0.879]
+  min_rule    0.873  [0.808, 0.924]
+
+KEY COMPARISONS: fusion minus other method (paired bootstrap)
+  F1  fusion - audio_only: point +0.269  CI [+0.195, +0.339]  share of draws > 0: 1.00
+  F1  fusion - text_only : point +0.202  CI [+0.137, +0.280]  share of draws > 0: 1.00
+  F1  fusion - mean_rule : point -0.017  CI [-0.064, +0.027]  share of draws > 0: 0.21
+  F1  fusion - min_rule  : point -0.008  CI [-0.063, +0.059]  share of draws > 0: 0.40
+  PR  fusion - audio_only: point +0.526  CI [+0.454, +0.594]  share of draws > 0: 1.00
+  PR  fusion - text_only : point +0.385  CI [+0.309, +0.467]  share of draws > 0: 1.00
+  PR  fusion - mean_rule : point +0.044  CI [+0.009, +0.083]  share of draws > 0: 0.99
+  PR  fusion - min_rule  : point -0.014  CI [-0.043, +0.013]  share of draws > 0: 0.14
+
+PER-ROTATION HIGH-class F1 (each rotation: own thresholds, test fold only)
+ rotation  audio_only  text_only  fusion  mean_rule  min_rule
+        0       0.498      0.595   0.792      0.823     0.854
+        1       0.405      0.479   0.662      0.710     0.786
+        2       0.497      0.523   0.743      0.765     0.713
+        3       0.478      0.613   0.801      0.804     0.789
+        4       0.489      0.546   0.741      0.720     0.605
+mean +/- std: audio_only=0.473+/-0.039, text_only=0.551+/-0.054, fusion=0.748+/-0.055, mean_rule=0.764+/-0.050, min_rule=0.749+/-0.095
+
+SHARE OF SCENARIOS CALLED HIGH, by scenario cell (pooled TEST, point estimates)
+                                     audio_only  text_only  fusion  mean_rule  min_rule
+cell                 scenario_label                                                    
+DISTRESS+ABUSIVE     MODERATE             0.855      0.164   0.196      0.061     0.059
+DISTRESS+BENIGN      MODERATE             0.858      0.003   0.006      0.005     0.006
+DISTRESS+THREAT      HIGH                 0.864      0.779   0.740      0.671     0.673
+NON-DISTRESS+ABUSIVE LOW                  0.015      0.145   0.003      0.000     0.003
+NON-DISTRESS+BENIGN  LOW                  0.009      0.003   0.000      0.000     0.001
+NON-DISTRESS+THREAT  MODERATE             0.012      0.757   0.034      0.017     0.040
+
+SECONDARY: 3-class macro-F1 (LOW/MODERATE/HIGH, argmax), pooled TEST
+  audio_only  macro-F1 = 0.494
+  text_only   macro-F1 = 0.472
+  fusion      macro-F1 = 0.820
+Fusion confusion matrix (rows true, cols predicted; LOW, MODERATE, HIGH):
+[[2808  191    1]
+ [ 558 3759  183]
+ [   5  510  985]]
+
+UNCERTAIN ANALYSIS (fusion HIGH calls with agreement below tau shown as UNCERTAIN)
+Fusion HIGH calls: 1469 | shown as UNCERTAIN: 279
+Share of fusion HIGH calls shown as UNCERTAIN, by true cell:
+                       mean  size
+cell                             
+DISTRESS+ABUSIVE      0.602   294
+DISTRESS+BENIGN       0.444     9
+DISTRESS+THREAT       0.077  1110
+NON-DISTRESS+ABUSIVE  0.000     5
+NON-DISTRESS+THREAT   0.235    51
+Precision of all fusion HIGH calls: 0.756 | precision of confident HIGH only: 0.861 (n=1190)
+HIGH recall, all fusion HIGH calls: 0.740 | confident HIGH only: 0.683
+
+Fusion model HIGH-class coefficients (standardised features, mean over 5 rotations):
+  logit_p_audio      +2.123
+  logit_p_threat     +2.424
+  logit_p_abusive    +0.769
+  abs_diff           +0.230
+  p_audio*p_threat   +0.451

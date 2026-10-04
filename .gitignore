@@ -1,0 +1,29 @@
+# Virtual environment (re-create from requirements.txt)
+.venv/
+
+# Raw datasets: licences (ESC-50 CC BY-NC 3.0, Deeply CC BY-NC-ND 4.0,
+# Jigsaw text under CC-SA 3.0) mean we do not redistribute them.
+# Download them from the original sources (see docs/dataset_log.md).
+data/raw/
+
+# Derived from licensed data; re-create with the scripts in src/
+data/processed/text_train.csv
+data/processed/text_val.csv
+data/processed/text_test.csv
+data/processed/audio_embeddings.npz
+
+# Downloaded YAMNet cache (re-downloaded by tensorflow-hub)
+models/tfhub_cache/
+
+# Python and tool caches
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Editor and OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
