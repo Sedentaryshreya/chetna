@@ -33,7 +33,9 @@
 - p_audio is a score, not a calibrated probability; threshold chosen in Phase 4.
 - Evidence shown in the app (YAMNet's top labels) describes what YAMNet detected, not
   a decomposition of the logistic-regression decision.
-- Clips shorter than 0.96 s cannot be processed.
+- Clips shorter than 0.96 s are padded by YAMNet to one frame and still receive a score
+  (checked 8 Oct 2026 with synthetic tones of 0.2 s and longer). Scores for very short
+  clips were not evaluated and should not be trusted. Correction to an earlier statement.
 - In the 3-clip consistency check, a held-out scream (p_audio 0.832) had YAMNet top
   labels Animal/Livestock/Fowl and Screaming max 0.262: the classifier score is not
   explained by YAMNet's top labels.
