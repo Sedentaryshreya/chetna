@@ -13,6 +13,9 @@ data/processed/text_val.csv
 data/processed/text_test.csv
 data/processed/audio_embeddings.npz
 
+# Contains local file paths; the deployed app uses data/deploy/audio_reference.csv
+data/processed/audio_manifest.csv
+
 # The YAMNet cache in models/tfhub_cache/ is now committed on purpose
 # (about 17 MB) so a server does not have to download it at start-up.
 
