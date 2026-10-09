@@ -16,19 +16,24 @@ import predict_audio
 import predict_text
 
 PROC = os.path.join(ROOT, "data", "processed")
+REF_PATH = os.path.join(ROOT, "data", "deploy", "audio_reference.csv")
 MAX_CHARS = 5000
 _ref = None
 
 
 def _reference():
-    """Dataset clips by file name, with their cross-validated (held-out) audio score."""
+    """Dataset clips by file name, with their cross-validated (held-out) audio score.
+
+    Reads data/deploy/audio_reference.csv (no local paths). If the file is missing,
+    returns an empty table, so uploads are simply never flagged as dataset clips.
+    """
     global _ref
     if _ref is None:
-        man = pd.read_csv(os.path.join(PROC, "audio_manifest.csv"))
-        oof = pd.read_csv(os.path.join(PROC, "audio_oof_probs.csv"))[["clip_id", "p_audio"]]
-        df = man[["clip_id", "path", "source", "original_label", "binary_label"]].merge(oof, on="clip_id")
-        df["name"] = df["path"].map(os.path.basename)
-        _ref = df.drop_duplicates("name").set_index("name")
+        if os.path.exists(REF_PATH):
+            _ref = pd.read_csv(REF_PATH).drop_duplicates("name").set_index("name")
+        else:
+            _ref = pd.DataFrame(columns=["source", "original_label", "binary_label", "p_audio"])
+            _ref.index.name = "name"
     return _ref
 
 

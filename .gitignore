@@ -1,5 +1,6 @@
-# Virtual environment (re-create from requirements.txt)
+# Virtual environments (re-create from requirements.txt)
 .venv/
+chetna_testenv/
 
 # Raw datasets: licences (ESC-50 CC BY-NC 3.0, Deeply CC BY-NC-ND 4.0,
 # Jigsaw text under CC-SA 3.0) mean we do not redistribute them.
@@ -12,8 +13,11 @@ data/processed/text_val.csv
 data/processed/text_test.csv
 data/processed/audio_embeddings.npz
 
-# Downloaded YAMNet cache (re-downloaded by tensorflow-hub)
-models/tfhub_cache/
+# The YAMNet cache in models/tfhub_cache/ is now committed on purpose
+# (about 17 MB) so a server does not have to download it at start-up.
+
+# Personal backup copies of requirements files
+requirements_before*.txt
 
 # Python and tool caches
 __pycache__/
@@ -25,5 +29,6 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Temporary files
+# Temporary files and logs
 *.tmp
+*.log

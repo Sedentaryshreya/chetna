@@ -1,2 +1,3 @@
-[server]
-address = "localhost"
+# Deployment: no server settings here, the host decides.
+# Local run (keeps the app private to this computer):
+#   python -m streamlit run app.py --server.address localhost

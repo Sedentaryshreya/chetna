@@ -12,11 +12,14 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(ROOT, "src"))
 
 import pandas as pd
+import soundfile as sf
 import streamlit as st
 
 import pipeline
 
 st.set_page_config(page_title="Chetna", layout="wide")
+
+MAX_SECONDS = 30  # design choice to protect a small server; not a validated limit
 
 DEMO_TEXTS = {
     "Benign: class note": "Thanks for sharing the notes, see you in class tomorrow.",
@@ -34,7 +37,11 @@ LEVEL_UI = {
 
 @st.cache_data
 def demo_clips():
-    man = pd.read_csv(os.path.join(ROOT, "data", "processed", "audio_manifest.csv"))
+    """Dataset demo clips. Only offered if the manifest and the audio files exist on this machine."""
+    mpath = os.path.join(ROOT, "data", "processed", "audio_manifest.csv")
+    if not os.path.exists(mpath):
+        return []
+    man = pd.read_csv(mpath)
     picks = []
     scr = man[man["binary_label"] == 1]
     for i in range(min(2, len(scr))):
@@ -47,7 +54,7 @@ def demo_clips():
         row = man[man["original_label"] == lab]
         if len(row):
             picks.append((nice, row.iloc[0]["path"]))
-    return picks
+    return [(name, path) for name, path in picks if os.path.exists(path)]
 
 
 def show_result(r):
@@ -147,8 +154,10 @@ with st.sidebar:
     )
     st.header("Privacy")
     st.write(
-        "Everything runs on this computer. Uploaded audio is written to a temporary file and deleted "
-        "right after the analysis. Nothing is stored."
+        "The analysis runs on the machine that hosts this app (your own computer if you run it locally). "
+        "Uploaded audio is written to a temporary file and deleted right after the analysis. "
+        "This app does not save your audio or text. "
+        "Please do not upload real emergency recordings or personal conversations."
     )
 
 tab1, tab2 = st.tabs(["Analyze", "Evaluation results"])
@@ -156,17 +165,21 @@ tab1, tab2 = st.tabs(["Analyze", "Evaluation results"])
 with tab1:
     col_a, col_t = st.columns(2)
     audio_path, audio_name, uploaded = None, None, None
+    clips = demo_clips()
 
     with col_a:
         st.subheader("1. Audio")
-        mode = st.radio("Audio source", ["Upload a file", "Use a dataset demo clip"], horizontal=True)
+        modes = ["Upload a file"] + (["Use a dataset demo clip"] if clips else [])
+        mode = st.radio("Audio source", modes, horizontal=True)
         if mode == "Upload a file":
             uploaded = st.file_uploader("Audio file (WAV works best)", type=["wav", "flac", "ogg", "mp3"])
+            st.caption(f"Maximum {MAX_SECONDS} seconds and 10 MB.")
+            if not clips:
+                st.caption("Dataset demo clips are not included in this version. Please upload a short audio file.")
             if uploaded is not None:
                 st.audio(uploaded)
                 audio_name = uploaded.name
         else:
-            clips = demo_clips()
             choice = st.selectbox("Demo clip", [c[0] for c in clips])
             audio_path = dict(clips)[choice]
             audio_name = os.path.basename(audio_path)
@@ -194,6 +207,14 @@ with tab1:
                 with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
                     tmp.write(data)
                     tmp_path = tmp.name
+                try:
+                    dur = sf.info(tmp_path).duration
+                except Exception:
+                    dur = None  # header not readable here; the audio loader will try next
+                if dur is not None and dur > MAX_SECONDS:
+                    raise ValueError(
+                        f"The audio is {dur:.0f} s long. Please use a clip of {MAX_SECONDS} s or less."
+                    )
                 audio_path = tmp_path
             with st.spinner("Running audio model, text model and fusion..."):
                 st.session_state["result"] = pipeline.analyze(audio_path, text, display_name=audio_name)
