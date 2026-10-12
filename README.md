@@ -1,9 +1,12 @@
-# Chetna: Context-Aware Multimodal Safety-Risk Assessment (Audio + Text Evidence Fusion)
+Chetna: Context-Aware Multimodal Safety-Risk Assessment (Audio + Text Evidence Fusion)
 
 An explainable multimodal safety-risk assessment and early-warning prototype that
 combines audio and textual evidence to estimate potential safety risk.
 
 Author: Shreya Gautam, B.Tech CSE (AI & ML). Submission for IBM BharatCares, October 2026.
+
+**Live demo:** <https://chetna-5runma5w5u996nec3yrppq.streamlit.app/> (free hosting: if the app is
+asleep, click the wake-up button and wait a minute or two).
 
 **Core question:** does combining independent audio and text evidence give a more
 context-aware risk assessment than either alone? The output states are
@@ -45,17 +48,33 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 ```powershell
-python -m streamlit run app.py
+python -m streamlit run app.py --server.address localhost
 ```
 
-The prompt should start with `(.venv)`. The app opens on localhost only
-(`.streamlit\config.toml`).
+The prompt should start with `(.venv)`. The `--server.address localhost` flag keeps the
+app private to your computer. It is deliberately not set in `.streamlit\config.toml`, so
+that a hosting platform can serve the app.
 
-- **First run needs internet:** YAMNet is downloaded from TensorFlow Hub into
-  `models\tfhub_cache\` (not stored in this repository).
+- **YAMNet:** the YAMNet files (about 17 MB) are included in `models\tfhub_cache\`, so the
+  app should not need to download them. If that folder is missing, TensorFlow Hub
+  downloads YAMNet on first run and needs internet. Loading from the included cache on a
+  fresh machine was not separately verified.
 - **Audio input:** use WAV files. m4a is not readable without ffmpeg.
-- **Dataset demo clips** need the datasets downloaded (see below). The file
-  `data\processed\audio_manifest.csv` stores absolute paths from the author's machine.
+- **Dataset demo clips** need the datasets downloaded (see below) and
+  `data\processed\audio_manifest.csv`, which is not in this repository because it stores
+  absolute paths from the author's machine. Without them the demo-clip option is hidden
+  and you upload a WAV instead.
+- **Upload limits:** 30 seconds and 10 MB per clip. These are design choices to protect a
+  small server, not validated limits.
+
+## Live demo and deployment
+
+The public demo runs on Streamlit Community Cloud from the `deploy-prep` branch with
+Python 3.13. `requirements.txt` lists only the packages the app needs, pinned to the
+versions the models were saved with. Held-out scores for known dataset clips come from
+`data\deploy\audio_reference.csv` (no local paths), built by
+`src\make_deploy_reference.py`. The analysis runs on CPU; the first analysis took about
+5 seconds in one test. Free hosting sleeps when idle.
 
 ## Run the tests
 
@@ -66,6 +85,11 @@ python -m pytest tests -v
 22 tests (fusion logic, end-to-end pipeline on a synthetic WAV, audio edge cases).
 They check structure and rules, not accuracy. Performance claims come only from
 `src\evaluation\evaluate_fusion.py`.
+
+`tests\test_env.py` only prints library versions and needs matplotlib, which the app does
+not use. In an environment built only from `requirements.txt`, run
+`python -m pytest tests -v --ignore=tests/test_env.py`. The evaluation script also needs
+matplotlib (`pip install matplotlib`).
 
 ## Data and licences
 
@@ -133,9 +157,11 @@ Full details: `results\fusion_metrics.txt`, `docs\phase4_summary.md`.
 ## Ethics and privacy
 
 Only public datasets and synthetic pairings were used. No real emergency recordings
-or personal conversations were collected. The app processes uploaded audio in a
+or personal conversations were collected. The app writes uploaded audio to a
 temporary file that is deleted after analysis (deletion was not separately verified)
-and sends nothing over the network, apart from downloading YAMNet on first run.
+and does not save audio or text. Run locally, nothing leaves your computer. On the public
+demo the analysis runs on the hosting server (Streamlit Community Cloud), so please do
+not upload real emergency recordings or personal conversations.
 Any real deployment would need informed opt-in consent, event-triggered (not
 continuous) audio, and human review of every alert.
 
@@ -150,13 +176,16 @@ does not prevent violence.
 ```
 app.py                  Streamlit interface
 src/pipeline.py         analyze(): audio + text + fusion + explanation
+src/make_deploy_reference.py  builds data/deploy/audio_reference.csv (no local paths)
 src/audio/              YAMNet features, audio model
 src/text/               text data preparation and model
 src/fusion/             scenario building and fusion model
 src/evaluation/         evaluate_fusion.py (the only source of performance claims)
 tests/                  22 tests
-models/                 trained models (YAMNet cache excluded)
-data/processed/         manifests and scores (no audio, no comment text)
+models/                 trained models and the YAMNet cache
+data/processed/         scores (no audio, no comment text); large files and the
+                        path-bearing manifest are git-ignored
+data/deploy/            audio_reference.csv (held-out scores by clip name)
 data/scenarios/         synthetic scenario table
 results/                metrics and figures
 docs/                   dataset log, frozen rules and protocol, phase summaries
